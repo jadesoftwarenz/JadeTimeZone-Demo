@@ -9,10 +9,10 @@ localeDefinitions
 		setModifiedTimeStamp "cnwhm6" "20.0.02" 2021:10:07:14:16:11.935;
 libraryDefinitions
 typeHeaders
-	MeetingsIncSchema subclassOf RootSchemaApp transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, highestSubId = 1, highestOrdinal = 4, number = 2058;
-	GMeetingsIncSchema subclassOf RootSchemaGlobal transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, highestSubId = 2, highestOrdinal = 2, number = 2059;
+	MeetingsIncSchema subclassOf RootSchemaApp transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, highestSubId = 1, highestOrdinal = 4, number = 2051;
+	GMeetingsIncSchema subclassOf RootSchemaGlobal transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, highestSubId = 2, highestOrdinal = 2, number = 2052;
 	Meeting subclassOf Object highestSubId = 1, highestOrdinal = 5, number = 2064;
-	SMeetingsIncSchema subclassOf RootSchemaSession transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, number = 2060;
+	SMeetingsIncSchema subclassOf RootSchemaSession transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, number = 2053;
 	DesignMeetingGui subclassOf Form transient, transientAllowed, subclassTransientAllowed, highestOrdinal = 8, number = 2063;
 	MeetingsIncGui subclassOf Form transient, transientAllowed, subclassTransientAllowed, highestOrdinal = 5, number = 2061;
 	TimeTravelGui subclassOf Form transient, transientAllowed, subclassTransientAllowed, highestOrdinal = 2, number = 2062;
@@ -43,10 +43,12 @@ typeDefinitions
 		setModifiedTimeStamp "cnwhm6" "20.0.02" 2021:10:11:13:29:00.426;
  
 	jadeMethodDefinitions
+		setTimeZones() number = 1003;
+		setModifiedTimeStamp "cnwta3" "20.0.02" 2021:10:21:14:25:59.724;
 		setupTimeZones() updating, number = 1002;
 		setModifiedTimeStamp "cnwhm6" "20.0.02" 2021:10:11:15:18:03.822;
 		startup() updating, number = 1001;
-		setModifiedTimeStamp "cnwhm6" "20.0.02" 2021:10:11:14:58:04.310;
+		setModifiedTimeStamp "cnwta3" "20.0.02" 2021:10:21:14:39:26.775;
 	)
 	Global completeDefinition
 	(
@@ -70,7 +72,7 @@ typeDefinitions
 		inspectMeetings() number = 1003;
 		setModifiedTimeStamp "cnwhm6" "20.0.02" 2021:10:21:13:02:03.605;
 		purgeInstances() number = 1001;
-		setModifiedTimeStamp "cnwhm6" "20.0.02" 2021:10:11:13:23:27.370;
+		setModifiedTimeStamp "cnwta3" "20.0.02" 2021:10:21:14:39:58.831;
 		setTimeZones() number = 1002;
 		setModifiedTimeStamp "cnwhm6" "20.0.02" 2021:10:11:13:58:48.683;
 	)
@@ -173,9 +175,9 @@ typeDefinitions
 		setModifiedTimeStamp "cnwhm6" "20.0.02" 2021:10:11:14:12:22.304;
 		lstMeetings_displayEntry(
 			listbox: ListBox input; 
-			obj: Any; 
+			meetingToDisplay: Meeting; 
 			lstIndex: Integer): String updating, number = 1003;
-		setModifiedTimeStamp "cnwhm6" "20.0.02" 2021:10:11:15:20:52.550;
+		setModifiedTimeStamp "cnwta3" "20.0.02" 2021:10:21:14:41:03.174;
 		updateLblSelectedTimeZone() number = 1006;
 		setModifiedTimeStamp "cnwhm6" "20.0.02" 2021:10:11:14:11:18.477;
  
@@ -234,7 +236,7 @@ MeetingsIncSchemaDb
 	(
 		setModifiedTimeStamp "cnwhm6" "20.0.02" 2021:10:07:14:16:11.958;
 	databaseFileDefinitions
-		"meetingsincschema" number = 52;
+		"meetingsincschema" number = 51;
 		setModifiedTimeStamp "cnwhm6" "20.0.02" 2021:10:07:14:16:11.958;
 	defaultFileDefinition "meetingsincschema";
 	classMapDefinitions
@@ -250,6 +252,30 @@ exportedPackageDefinitions
 typeSources
 	MeetingsIncSchema (
 	jadeMethodSources
+setTimeZones
+{
+setTimeZones();
+
+vars
+
+begin
+	beginTransaction;
+	if global.allTimeZoneNames = null then
+		create global.allTimeZoneNames persistent;
+	endif; 
+	global.allTimeZoneNames.purge();
+	global.allTimeZoneNames.add("Europe/London");
+	global.allTimeZoneNames.add("Europe/Madrid");
+	global.allTimeZoneNames.add("Asia/Shanghai");
+	global.allTimeZoneNames.add("America/Chicago");
+	global.allTimeZoneNames.add("America/Sao_Paulo");
+	global.allTimeZoneNames.add("Africa/Cairo");
+	global.allTimeZoneNames.add("Australia/Brisbane");
+	commitTransaction;
+end;
+
+}
+
 setupTimeZones
 {
 setupTimeZones() updating;
@@ -282,6 +308,8 @@ vars
 	newMeeting: Meeting;
 	skin: JadeSkinRoot;
 begin
+	setTimeZones();
+	
 	skin := JadeSkinRoot.firstInstance;
 	app.setApplicationSkin(skin.allApplicationSkins["JADE Boogie Blue"]);
 	
@@ -324,17 +352,13 @@ purgeInstances
 purgeInstances();
 
 vars
-	coll: ObjectArray;
+
 begin
-	create coll transient;
 	beginTransaction;
-	MeetingArray.allInstances(coll, 0, true);
-	coll.purge();
-	Meeting.allInstances(coll, 0, true);
-	coll.purge();
+	global.allMeetings.purge();
 	commitTransaction;
 epilog
-	delete coll;
+
 end;
 
 }
@@ -507,13 +531,11 @@ end;
 
 lstMeetings_displayEntry
 {
-lstMeetings_displayEntry(listbox: ListBox input; obj: Any; lstIndex: Integer):String updating;
+lstMeetings_displayEntry(listbox: ListBox input; meetingToDisplay: Meeting; lstIndex: Integer):String updating;
 
 vars
-	meetingToDisplay: Meeting;
 	localisedMeetingTime: TimeStamp;
 begin
-	meetingToDisplay := obj.Meeting;
 	
 	//Convert from the time the UTC time the database has given us to local time for display
 	localisedMeetingTime := app.currentTimeZone.convertTimeFromUtc(meetingToDisplay.utcTime);
