@@ -1,7 +1,7 @@
 This repository contains a copy of the Meetings Inc App, which was used to demonstrate the JadeTimeZone class at the 2021 JUG part 2.
 Disclaimer: The code provided is correct as of JADE 2020 Service Pack 1, but will not be maintained. It serves as a demo of the usage and capabilites of the JadeTimeZone class, and should not be used as an example of how to write an app in JADE.
 
-A detailed presentation of the demo can be found at [JUG recording link to come - stay tuned!]
+A detailed presentation of the demo can be found at: https://youtu.be/vkDBpvHVazU?t=2244
 
 Getting started:
 1. Make sure you have a JADE2020 Service Pack 1 installation (later versions should also be compatible)
